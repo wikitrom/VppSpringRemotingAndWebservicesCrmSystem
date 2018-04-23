@@ -2,9 +2,10 @@
 
 VPP Spring Remoting and Webservices - chapter 14-28, using REST
 
-**Note**: 
+**Notes**: 
  - The exercise use a server-client application setup.
  - This repo holds the server-side app.
+ - Need the tomcat server up and running with provided /mywebbapp/ application started.
  - Related client-side app is in repo: TBA
 
 **Chapter summary**:
