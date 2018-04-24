@@ -5,7 +5,6 @@
 
 	<import resource="/daos.xml"/>
 	<import resource="/services.xml"/>
-	<!-- <import resource="/datasource-production.xml"/> -->
 	<import resource="/datasource-webapp.xml"/>
 	<import resource="/misc-beans.xml"/>	
 

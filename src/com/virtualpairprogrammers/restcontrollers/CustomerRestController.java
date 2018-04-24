@@ -1,29 +1,31 @@
 package com.virtualpairprogrammers.restcontrollers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.virtualpairprogrammers.domain.Customer;
 import com.virtualpairprogrammers.services.customers.CustomerManagementService;
 import com.virtualpairprogrammers.services.customers.CustomerNotFoundException;
 
-@Controller
+@RestController
 public class CustomerRestController {
-
 	@Autowired
 	private CustomerManagementService customerService;
 
-	// add support for GET to /customer/3737373
-	@RequestMapping("/customer/{id}")
+	// we want to support GETs to /customer/373737
+	@RequestMapping(value = "/customer/{id}", headers = { "Accept=application/json", "Accept=application/xml" })
 	public Customer findCustomerById(@PathVariable String id) {
+		Customer foundCustomer;
 		try {
-			Customer foundCustomer = customerService.getFullCustomerDetail(id);
-			return foundCustomer;
+			foundCustomer = customerService.getFullCustomerDetail(id);
 		} catch (CustomerNotFoundException e) {
-			// TODO: handle exception
+			// TODO - improve this
 			throw new RuntimeException(e);
 		}
+
+		// return as JSON instead of XML
+		return foundCustomer;
 	}
 }

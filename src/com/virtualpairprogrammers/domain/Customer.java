@@ -8,6 +8,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Represents a customer in the CRM system.
@@ -18,6 +19,7 @@ import javax.persistence.OneToMany;
  * @author Richard Chesterwood
  */
 @Entity
+@XmlRootElement
 public class Customer implements Serializable
 {
 	/**
