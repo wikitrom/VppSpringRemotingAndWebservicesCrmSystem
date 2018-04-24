@@ -15,7 +15,7 @@ public class CustomerRestController {
 	private CustomerManagementService customerService;
 
 	// we want to support GETs to /customer/373737
-	@RequestMapping(value = "/customer/{id}", headers = { "Accept=application/json", "Accept=application/xml" })
+	@RequestMapping(value = "/customer/{id}")
 	public Customer findCustomerById(@PathVariable String id) {
 		Customer foundCustomer;
 		try {
@@ -25,7 +25,8 @@ public class CustomerRestController {
 			throw new RuntimeException(e);
 		}
 
-		// return as JSON instead of XML
+		// the returned object will be picked up by an httpmessageconverter (if a
+		// suitable one exist) to fulfill the content type requested by the client
 		return foundCustomer;
 	}
 }
