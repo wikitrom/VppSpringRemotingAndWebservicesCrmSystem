@@ -39,7 +39,7 @@
 			</map>
 		</property>
 
-		<!-- rule 3: enable (use http accept headers is provided) -->
+		<!-- rule 3: enable (do NOT ignore http accept headers if provided, use them) -->
 		<property name="ignoreAcceptHeader" value="false" />
 
 		<!-- Default if non of the rules above applies is whatever the RestClient.javacode 
