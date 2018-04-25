@@ -1,9 +1,13 @@
 package com.virtualpairprogrammers.services.customers;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 /**
  * An exception type denoting that the required customer was not found.
  * @author Richard Chesterwood
  */
+@ResponseStatus(value=HttpStatus.NOT_FOUND, reason="The customer was not found")
 public class CustomerNotFoundException extends Exception 
 {
 	// I've added this just to stop the annoying warning in Eclipse.
