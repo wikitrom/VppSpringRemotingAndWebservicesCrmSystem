@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.virtualpairprogrammers.domain.Customer;
@@ -24,7 +25,7 @@ public class CustomerRestController {
 
 	// -- Error handling
 
-	// use spring error handling support
+	// use spring error handling support - use ResponseEntity to return error data
 	@ExceptionHandler(CustomerNotFoundException.class)
 	public ResponseEntity<ClientErrorInformation> rulesForCustomerNotFound(HttpServletRequest req, Exception e) {
 
@@ -47,7 +48,8 @@ public class CustomerRestController {
 	 * @return
 	 */
 	@RequestMapping(value = "/customers")
-	public CustomerCollectionRepresentation returnAllCustomers() {
+	public CustomerCollectionRepresentation returnAllCustomers(@RequestParam(required = false) Integer first,
+			@RequestParam(required = false) Integer last) {
 
 		List<Customer> allCustomers = customerService.getAllCustomers();
 		// remove calls before return
@@ -55,10 +57,18 @@ public class CustomerRestController {
 			next.setCalls(null);
 		}
 
-		// sent to the message converter
-		// wrap customer list in another object in order for the converter to be able to
-		// return xml-formatted data
-		return new CustomerCollectionRepresentation(allCustomers);
+		// TODO: IMPORTANT! always check parameters before using them, skipped here
+
+		// return value is sent to the message converter for further processing
+		// note: we wrap allCustomer list in another object in order for the converter to
+		// be able to return XML-formatted data
+
+		if (first != null && last != null) {
+			// sublist is exclusive -> last
+			return new CustomerCollectionRepresentation(allCustomers.subList(first - 1, last));
+		} else {
+			return new CustomerCollectionRepresentation(allCustomers);
+		}
 	}
 
 }
