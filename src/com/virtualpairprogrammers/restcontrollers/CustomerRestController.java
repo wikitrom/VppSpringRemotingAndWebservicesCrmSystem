@@ -1,5 +1,7 @@
 package com.virtualpairprogrammers.restcontrollers;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,23 @@ public class CustomerRestController {
 	// we want to support GETs to /customer/373737
 	@RequestMapping(value = "/customer/{id}")
 	public Customer findCustomerById(@PathVariable String id) throws CustomerNotFoundException {
-		return customerService.getFullCustomerDetail(id);
+		return customerService.getFullCustomerDetail(id); // sent to the message converter
 	}
+
+	/**
+	 * Requirement: ONLY return customers
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/customers")
+	public List<Customer> returnAllCustomers() {
+		List<Customer> allCustomers = customerService.getAllCustomers();
+
+		for(Customer next : allCustomers) {
+			next.setCalls(null);
+		}
+		
+		return allCustomers; // sent to the message converter
+	}
+
 }
