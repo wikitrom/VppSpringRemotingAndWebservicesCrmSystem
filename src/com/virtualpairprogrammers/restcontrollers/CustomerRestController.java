@@ -9,14 +9,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.virtualpairprogrammers.domain.Customer;
 import com.virtualpairprogrammers.restrepresentations.CustomerCollectionRepresentation;
 import com.virtualpairprogrammers.services.customers.CustomerManagementService;
 import com.virtualpairprogrammers.services.customers.CustomerNotFoundException;
+
 
 @RestController
 public class CustomerRestController {
@@ -36,8 +40,10 @@ public class CustomerRestController {
 
 	// -- HTTP Request handlers
 
+	// --- GET handlers
+
 	// we want to support GETs to /customer/373737
-	@RequestMapping(value = "/customer/{id}")
+	@RequestMapping(value = "/customer/{id}", method=RequestMethod.GET)
 	public Customer findCustomerById(@PathVariable String id) throws CustomerNotFoundException {
 		return customerService.getFullCustomerDetail(id); // sent to the message converter
 	}
@@ -47,7 +53,7 @@ public class CustomerRestController {
 	 * 
 	 * @return
 	 */
-	@RequestMapping(value = "/customers")
+	@RequestMapping(value = "/customers", method=RequestMethod.GET)
 	public CustomerCollectionRepresentation returnAllCustomers(@RequestParam(required = false) Integer first,
 			@RequestParam(required = false) Integer last) {
 
@@ -60,7 +66,8 @@ public class CustomerRestController {
 		// TODO: IMPORTANT! always check parameters before using them, skipped here
 
 		// return value is sent to the message converter for further processing
-		// note: we wrap allCustomer list in another object in order for the converter to
+		// note: we wrap allCustomer list in another object in order for the converter
+		// to
 		// be able to return XML-formatted data
 
 		if (first != null && last != null) {
@@ -71,4 +78,17 @@ public class CustomerRestController {
 		}
 	}
 
+
+	// --- POST handlers
+
+	@RequestMapping(value="/customers", method=RequestMethod.POST)
+	@ResponseStatus(value=HttpStatus.CREATED)
+	public Customer createNewCustomer (@RequestBody Customer newCustomer) {
+			return customerService.newCustomer(newCustomer);
+	}
+	
+	// --- PUT handlers
+
+	// --- DELETE handlers
+	// N/A
 }

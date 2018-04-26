@@ -2,6 +2,14 @@ package com.virtualpairprogrammers.restcontrollers;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * 
+ * This is a helper class to carry the data to be returned when we throw an
+ * exception of some kind, i.e. when an HTTP error code is sent back to the
+ * client.
+ * 
+ * @author mrB
+ */
 @XmlRootElement
 public class ClientErrorInformation {
 
