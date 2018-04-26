@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.virtualpairprogrammers.domain.Customer;
+import com.virtualpairprogrammers.restrepresentations.CustomerCollectionRepresentation;
 import com.virtualpairprogrammers.services.customers.CustomerManagementService;
 import com.virtualpairprogrammers.services.customers.CustomerNotFoundException;
 
@@ -46,14 +47,18 @@ public class CustomerRestController {
 	 * @return
 	 */
 	@RequestMapping(value = "/customers")
-	public List<Customer> returnAllCustomers() {
-		List<Customer> allCustomers = customerService.getAllCustomers();
+	public CustomerCollectionRepresentation returnAllCustomers() {
 
-		for(Customer next : allCustomers) {
+		List<Customer> allCustomers = customerService.getAllCustomers();
+		// remove calls before return
+		for (Customer next : allCustomers) {
 			next.setCalls(null);
 		}
-		
-		return allCustomers; // sent to the message converter
+
+		// sent to the message converter
+		// wrap customer list in another object in order for the converter to be able to
+		// return xml-formatted data
+		return new CustomerCollectionRepresentation(allCustomers);
 	}
 
 }
