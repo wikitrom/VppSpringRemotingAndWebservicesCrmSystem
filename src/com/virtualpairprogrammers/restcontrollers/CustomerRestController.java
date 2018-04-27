@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,7 +29,7 @@ public class CustomerRestController {
 	// -- Error handling
 
 	// use spring error handling support - use ResponseEntity to return error data
-	@ExceptionHandler(CustomerNotFoundException.class)
+	@ExceptionHandler(CustomerNotFoundException.class)   // what to do if CustomerNotFoundException is thrown
 	public ResponseEntity<ClientErrorInformation> rulesForCustomerNotFound(HttpServletRequest req, Exception e) {
 
 		// return a representation of the error/exception to client
@@ -50,7 +49,7 @@ public class CustomerRestController {
 
 	/**
 	 * Requirement: ONLY return customers
-	 * 
+	 *
 	 * @return
 	 */
 	@RequestMapping(value = "/customers", method = RequestMethod.GET)
@@ -81,19 +80,25 @@ public class CustomerRestController {
 	// --- POST handlers
 
 	@RequestMapping(value = "/customers", method = RequestMethod.POST)
-	@ResponseStatus(value = HttpStatus.CREATED)
+	@ResponseStatus(value = HttpStatus.CREATED) // 201
 	public Customer createNewCustomer(@RequestBody Customer newCustomer) {
 		return customerService.newCustomer(newCustomer);
 	}
 
 	// --- PUT handlers
 	@RequestMapping(value = "/customers", method = RequestMethod.PUT)
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
+	@ResponseStatus(value = HttpStatus.NO_CONTENT)  // 204
 	public void updateExistingCustomer(@RequestBody Customer newCustomer) throws CustomerNotFoundException {
 		customerService.updateCustomer(newCustomer);
 	}
 
 	// --- DELETE handlers
+	@RequestMapping(value = "/customer/{id}", method = RequestMethod.DELETE)
+	@ResponseStatus(value = HttpStatus.NO_CONTENT)  // 204
+	public void deleteCustomerById(@PathVariable String id) throws CustomerNotFoundException {
+		Customer customer = customerService.getFullCustomerDetail(id);
+		customerService.deleteCustomer(customer);
+	}
 	
 	// N/A
 }
