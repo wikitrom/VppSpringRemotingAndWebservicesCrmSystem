@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.virtualpairprogrammers.domain.Customer;
@@ -88,8 +89,13 @@ public class CustomerRestController {
 
 		// -- create return link to access new customer
 		HttpHeaders headers = new HttpHeaders();
-		URI uri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/customer/")
-				.path(createdCustomer.getCustomerId()).build().toUri();
+		// URI uri =
+		// ServletUriComponentsBuilder.fromCurrentContextPath().path("/customer/")
+		// .path(createdCustomer.getCustomerId()).build().toUri();
+
+		URI uri = MvcUriComponentsBuilder
+				.fromMethodName(CustomerRestController.class, "findCustomerById", createdCustomer.getCustomerId())
+				.build().toUri();
 		headers.setLocation(uri);
 
 		return new ResponseEntity<Customer>(createdCustomer, headers, HttpStatus.CREATED); // 201
