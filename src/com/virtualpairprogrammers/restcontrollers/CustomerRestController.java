@@ -1,10 +1,12 @@
 package com.virtualpairprogrammers.restcontrollers;
 
+import java.net.URI;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.virtualpairprogrammers.domain.Customer;
 import com.virtualpairprogrammers.restrepresentations.CustomerCollectionRepresentation;
@@ -29,7 +32,7 @@ public class CustomerRestController {
 	// -- Error handling
 
 	// use spring error handling support - use ResponseEntity to return error data
-	@ExceptionHandler(CustomerNotFoundException.class)   // what to do if CustomerNotFoundException is thrown
+	@ExceptionHandler(CustomerNotFoundException.class) // what to do if CustomerNotFoundException is thrown
 	public ResponseEntity<ClientErrorInformation> rulesForCustomerNotFound(HttpServletRequest req, Exception e) {
 
 		// return a representation of the error/exception to client
@@ -80,25 +83,34 @@ public class CustomerRestController {
 	// --- POST handlers
 
 	@RequestMapping(value = "/customers", method = RequestMethod.POST)
-	@ResponseStatus(value = HttpStatus.CREATED) // 201
-	public Customer createNewCustomer(@RequestBody Customer newCustomer) {
-		return customerService.newCustomer(newCustomer);
+	public ResponseEntity<Customer> createNewCustomer(@RequestBody Customer newCustomer) {
+		Customer createdCustomer = customerService.newCustomer(newCustomer);
+
+		// -- create return link to access new customer
+		HttpHeaders headers = new HttpHeaders();
+		URI uri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/customer/")
+				.path(createdCustomer.getCustomerId()).build().toUri();
+		headers.setLocation(uri);
+
+		return new ResponseEntity<Customer>(createdCustomer, headers, HttpStatus.CREATED); // 201
 	}
 
 	// --- PUT handlers
+
 	@RequestMapping(value = "/customers", method = RequestMethod.PUT)
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)  // 204
+	@ResponseStatus(value = HttpStatus.NO_CONTENT) // 204
 	public void updateExistingCustomer(@RequestBody Customer newCustomer) throws CustomerNotFoundException {
 		customerService.updateCustomer(newCustomer);
 	}
 
 	// --- DELETE handlers
+
 	@RequestMapping(value = "/customer/{id}", method = RequestMethod.DELETE)
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)  // 204
+	@ResponseStatus(value = HttpStatus.NO_CONTENT) // 204
 	public void deleteCustomerById(@PathVariable String id) throws CustomerNotFoundException {
 		Customer customer = customerService.getFullCustomerDetail(id);
 		customerService.deleteCustomer(customer);
 	}
-	
+
 	// N/A
 }
