@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.virtualpairprogrammers.domain.Customer;
 import com.virtualpairprogrammers.restrepresentations.CustomerCollectionRepresentation;
@@ -84,7 +83,8 @@ public class CustomerRestController {
 	// --- POST handlers
 
 	@RequestMapping(value = "/customers", method = RequestMethod.POST)
-	public ResponseEntity<Customer> createNewCustomer(@RequestBody Customer newCustomer) {
+	public ResponseEntity<Customer> createNewCustomer(@RequestBody Customer newCustomer)
+			throws CustomerNotFoundException {
 		Customer createdCustomer = customerService.newCustomer(newCustomer);
 
 		// -- create return link to access new customer
@@ -93,9 +93,24 @@ public class CustomerRestController {
 		// ServletUriComponentsBuilder.fromCurrentContextPath().path("/customer/")
 		// .path(createdCustomer.getCustomerId()).build().toUri();
 
-		URI uri = MvcUriComponentsBuilder
-				.fromMethodName(CustomerRestController.class, "findCustomerById", createdCustomer.getCustomerId())
-				.build().toUri();
+		// URI uri = MvcUriComponentsBuilder
+		// .fromMethodName(CustomerRestController.class, "findCustomerById",
+		// createdCustomer.getCustomerId())
+		// .build().toUri();
+
+		// -- using Spring HATEOAS
+		// --- the findCustomerById method below is not called, it's just an identifier
+		// --- however, eclipse will complain about try-catch, thus we
+		// --- have to add a throws-declaration to the method even though it will never
+		// --- occur
+		// URI uri = ControllerLinkBuilder
+		// .linkTo(ControllerLinkBuilder.methodOn(CustomerRestController.class).findCustomerById("109")).toUri();
+		// headers.setLocation(uri);
+
+		// this short version works because we use a static import of
+		// ControllerLinkBuilder.*
+		URI uri = linkTo(methodOn(CustomerRestController.class).findCustomerById(createdCustomer.getCustomerId()))
+				.toUri();
 		headers.setLocation(uri);
 
 		return new ResponseEntity<Customer>(createdCustomer, headers, HttpStatus.CREATED); // 201
