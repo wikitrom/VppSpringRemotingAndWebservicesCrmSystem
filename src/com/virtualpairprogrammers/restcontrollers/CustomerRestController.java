@@ -14,6 +14,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,10 +34,13 @@ public class CustomerRestController {
 	@Autowired
 	private CustomerManagementService customerService;
 
+	@Autowired
+	private CustomerValidator validator; // to validate customer objects
+
 	// -- Error handling
 
 	// use spring error handling support - use ResponseEntity to return error data
-	@ExceptionHandler(CustomerNotFoundException.class) // what to do if CustomerNotFoundException is thrown 
+	@ExceptionHandler(CustomerNotFoundException.class) // what to do if CustomerNotFoundException is thrown
 	public ResponseEntity<ClientErrorInformation> rulesForCustomerNotFound(HttpServletRequest req, Exception e) {
 
 		// return a representation of the error/exception to client
@@ -81,8 +85,10 @@ public class CustomerRestController {
 
 		if (first != null && last != null) {
 			// sublist is exclusive -> last
-			CustomerCollectionRepresentation page = new CustomerCollectionRepresentation(allCustomers.subList(first - 1, last));
-			page.add(linkTo(methodOn(CustomerRestController.class).returnAllCustomers(last+1, last+10)).withRel("next"));
+			CustomerCollectionRepresentation page = new CustomerCollectionRepresentation(
+					allCustomers.subList(first - 1, last));
+			page.add(linkTo(methodOn(CustomerRestController.class).returnAllCustomers(last + 1, last + 10))
+					.withRel("next"));
 			return page;
 		} else {
 			return new CustomerCollectionRepresentation(allCustomers);
@@ -91,9 +97,18 @@ public class CustomerRestController {
 
 	// --- POST handlers
 
+	// -- NOTE:
+	//
+	// The 'Errors errors' parameter is required by Spring Validator class.
 	@RequestMapping(value = "/customers", method = RequestMethod.POST)
-	public ResponseEntity<Customer> createNewCustomer(@RequestBody Customer newCustomer)
+	public ResponseEntity<Customer> createNewCustomer(@RequestBody Customer newCustomer, Errors errors)
 			throws CustomerNotFoundException {
+
+		// validate newCustomer object before use
+		validator.validate(newCustomer, errors);
+		if (errors.hasErrors()) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		Customer createdCustomer = customerService.newCustomer(newCustomer);
 
 		// -- create return link to access new customer
