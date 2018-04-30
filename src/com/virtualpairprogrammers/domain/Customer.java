@@ -10,91 +10,96 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.springframework.hateoas.ResourceSupport;
+
 /**
  * Represents a customer in the CRM system.
  * <p/>
- * Note that this is just a starting point - you are free to expand and
- * modify this class!
+ * Note that this is just a starting point - you are free to expand and modify
+ * this class!
+ *
+ * uabtrom NOTE:
+ *
+ * 'extends ResourceSupport' is a HATEOAS class to make it easier to return a
+ * link to an instance in REST communications. Normally we do not extend a
+ * doamin class like this.
+ *
+ * In a real system we should have a separate representation class for REST
+ * communication to avoid using 'extends ResourceSupport' in this class. This
+ * domain class should be kept fully POJO without any reference to Spring.
  *
  * @author Richard Chesterwood
  */
 @Entity
 @XmlRootElement
-public class Customer implements Serializable
-{
+public class Customer extends ResourceSupport implements Serializable {
 	/**
-	 * A simple unique value for the customer - note this is determined
-	 * by the business and is not necessarily the database primary key.
+	 * A simple unique value for the customer - note this is determined by the
+	 * business and is not necessarily the database primary key.
 	 */
 	@Id
 	private String customerId;
-	
+
 	/**
 	 * The company name
 	 */
 	private String companyName;
-	
+
 	/**
 	 * The contact's email address
 	 */
 	private String email;
-	
+
 	/**
 	 * The contact's telephone number
 	 */
 	private String telephone;
-	
+
 	/**
 	 * Any notes associated with this customer
 	 */
 	private String notes;
-	
+
 	/**
 	 * References to any Calls this customer has made
 	 */
-	@OneToMany(cascade=CascadeType.ALL)
-	private List<Call> calls;	
-	
+	@OneToMany(cascade = CascadeType.ALL)
+	private List<Call> calls;
+
 	/**
 	 * Constructor - id, notes and name are required
 	 */
-	public Customer(String customerId, String companyName, String email,
-			        String telephone, String notes)
-	{
+	public Customer(String customerId, String companyName, String email, String telephone, String notes) {
 		this(customerId, companyName, notes);
 		this.email = email;
 		this.telephone = telephone;
 	}
-	
+
 	/**
 	 * Constructor - email and telephone are optional
 	 */
-	public Customer(String customerId, String companyName, String notes)
-	{
+	public Customer(String customerId, String companyName, String notes) {
 		this.customerId = customerId;
 		this.companyName = companyName;
 		this.notes = notes;
 		this.calls = new ArrayList<Call>();
 	}
-	
+
 	/**
 	 * Add a new call for this customer
 	 */
-	public void addCall(Call callDetails) 
-	{
-		this.calls.add(callDetails);		
+	public void addCall(Call callDetails) {
+		this.calls.add(callDetails);
 	}
-	
+
 	/**
 	 * A Simple toString implementation
 	 */
-	public String toString()
-	{
-		return this.customerId + ": " + this.companyName ;
+	public String toString() {
+		return this.customerId + ": " + this.companyName;
 	}
 
-	public String getCustomerId() 
-	{
+	public String getCustomerId() {
 		return this.customerId;
 	}
 
@@ -143,5 +148,6 @@ public class Customer implements Serializable
 	}
 
 	// needed for JPA - ignore until then
-	public Customer() {}
+	public Customer() {
+	}
 }
